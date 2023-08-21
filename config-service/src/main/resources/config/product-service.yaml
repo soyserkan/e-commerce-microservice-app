@@ -1,0 +1,44 @@
+server:
+  port: 9788
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default-schema: stock_management
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/stock_management"
+    username: postgres
+    password: 123456
+
+management:
+  health:
+    circiutbreakers:
+      enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    health:
+      show-details: always
+    web:
+      exposure:
+        include: '*'
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Product Service
+    description: Product Service App
+    version: 0.0.1
+

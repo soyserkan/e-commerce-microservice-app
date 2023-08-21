@@ -1,0 +1,41 @@
+server:
+  port: 9789
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default-schema: stock_management
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/stock_management"
+    username: postgres
+    password: 123456
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Order Service
+    description: Order Service App
+    version: 0.0.1
+
