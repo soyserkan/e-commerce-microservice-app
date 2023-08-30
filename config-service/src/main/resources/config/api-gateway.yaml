@@ -1,0 +1,79 @@
+spring:
+  config:
+    activate:
+      on-profile: default
+  cloud:
+    gateway:
+      routes:
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/product/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/order/**
+        - id: price-and-inventory-service
+          uri: lb://price-and-inventory-service
+          predicates:
+            - Path=/api/v1/price-and-inventory/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://localhost:8080/realms/spring-boot-microservices-realm"
+
+
+server:
+  port: 8060
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: stage
+  cloud:
+    gateway:
+      routes:
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/product/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/order/**
+        - id: price-and-inventory-service
+          uri: lb://price-and-inventory-service
+          predicates:
+            - Path=/api/v1/price-and-inventory/**
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://keycloak:8080/realms/spring-boot-microservices-realm"
+
+
+server:
+  port: 8060
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://service-registry:8761/eureka/
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

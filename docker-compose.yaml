@@ -42,18 +42,113 @@ services:
     ports:
       - 9411:9411
 
-  keyclock:
+  keycloak:
+    container_name: keycloak
     image: quay.io/keycloak/keycloak:22.0.1
     networks:
       - integration-network-backend
     expose:
-      - 8181
+      - 8080
     ports:
-      - "8181:8080"
+      - "8080:8080"
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     command: start-dev
+
+  service-registry:
+    image: serkansoy/service-registry:latest
+    container_name: service-registry
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: stage
+    depends_on:
+      - zipkin
+      - config-service
+
+  api-gateway:
+    image: serkansoy/api-gateway:latest
+    container_name: api-gateway
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "8060:8060"
+    expose:
+      - "8060"
+    environment:
+      SPRING_PROFILES_ACTIVE: stage
+    depends_on:
+      - zipkin
+      - service-registry
+      - config-service
+      - keycloak
+
+  product-service:
+    image: serkansoy/product-service:latest
+    container_name: product-service
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "9788:9788"
+    environment:
+      SPRING_PROFILES_ACTIVE: stage
+    depends_on:
+      - service-registry
+      - api-gateway
+      - config-service
+      - postgres
+      - zipkin
+
+  order-service:
+    image: serkansoy/order-service:latest
+    container_name: order-service
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "9789:9789"
+    environment:
+      SPRING_PROFILES_ACTIVE: stage
+    depends_on:
+      - service-registry
+      - api-gateway
+      - config-service
+      - postgres
+      - zipkin
+
+  price-and-inventory-service:
+    image: serkansoy/price-and-inventory-service:latest
+    container_name: price-and-inventory-service
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "9786:9786"
+    environment:
+      SPRING_PROFILES_ACTIVE: stage
+    depends_on:
+      - service-registry
+      - api-gateway
+      - config-service
+      - redis
+      - zipkin
+
+  config-service:
+    image: serkansoy/config-service:latest
+    container_name: config-service
+    pull_policy: always
+    networks:
+      - integration-network-backend
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: native
 
 networks:
   integration-network-backend:
